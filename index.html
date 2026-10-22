@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MathVerse 幾何與函數 — 高中數學互動探索與試卷視覺化平台</title>
+  <meta name="description" content="專為高中數學設計的現代化互動學習平台，提供二次函數拋物線實時繪圖、不等式數線視覺化、平面解析幾何動態畫板、試卷題目完整逐步推導與即時自我檢測。">
+  <meta name="keywords" content="高中數學,二次函數,拋物線,頂點坐標,不等式數線,解析幾何,重心,圓直徑,平行四邊形,因式分解">
+  
+  <!-- Modern Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Grid Background -->
+  <div class="bg-grid-pattern" aria-hidden="true"></div>
+
+  <!-- Confetti Canvas for Quiz Celebration -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="container">
+    
+    <!-- Navigation Bar -->
+    <header>
+      <nav class="navbar" id="main-nav">
+        <a href="#" class="brand">
+          <div class="brand-icon">∑</div>
+          <span>MathVerse</span>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#parabola-lab" class="nav-link active">📈 拋物線實驗室</a></li>
+          <li><a href="#inequality-lab" class="nav-link">📏 不等式數線</a></li>
+          <li><a href="#geometry-lab" class="nav-link">📐 解析幾何</a></li>
+          <li><a href="#exam-cards" class="nav-link">📝 試卷全詳解</a></li>
+          <li><a href="#quiz-challenge" class="nav-link">💡 隨堂檢測</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+      <section class="hero" id="hero-section">
+        <div class="hero-badge">✨ 現代高一數學互動探索引擎</div>
+        <h1 class="hero-title">
+          讓幾何與函數在螢幕上<br>
+          <span class="text-gradient">活靈活現・直覺探索</span>
+        </h1>
+        <p class="hero-subtitle">
+          從二次函數拋物線、對稱軸與判別式，到絕對值不等式數線與圓解析幾何。透過即時動態圖形與完整試卷詳解，輕鬆掌握每個數學概念的精髓！
+        </p>
+        <div class="hero-actions">
+          <a href="#parabola-lab" class="btn btn-primary" id="btn-explore-parabola">開始探索拋物線 ➔</a>
+          <a href="#exam-cards" class="btn btn-secondary" id="btn-view-solutions">瀏覽試卷 13 題詳解</a>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           Module 1: Parabola Interactive Lab
+           ==================================================================== -->
+      <section class="glass-card" id="parabola-lab" style="margin-bottom: 3.5rem;">
+        <div class="section-header">
+          <div>
+            <div class="section-tag">⚡ Interactive Module 01</div>
+            <h2 class="section-title">二次函數與拋物線動態實驗室</h2>
+            <p class="section-desc">拖動滑桿即時觀察開口方向、頂點坐標、對稱軸及判別式變化，支援試卷題目一鍵載入。</p>
+          </div>
+          <div class="presets-bar" id="parabola-presets">
+            <button class="preset-chip active" onclick="loadParabolaPreset('q1')">載入試卷計算 1</button>
+            <button class="preset-chip" onclick="loadParabolaPreset('q2_1')">載入計算 2(1)</button>
+            <button class="preset-chip" onclick="loadParabolaPreset('q2_2')">載入計算 2(2)</button>
+            <button class="preset-chip" onclick="loadParabolaPreset('fill4')">載入填充 4 (平移)</button>
+          </div>
+        </div>
+
+        <div class="interactive-grid">
+          <!-- Canvas Container -->
+          <div class="canvas-container">
+            <div class="canvas-toolbar">
+              <div class="canvas-hud">
+                <span class="canvas-hud-tag" id="metricEquation">y = -2x² + 4x + 1</span>
+              </div>
+              <span style="font-size: 0.8rem; opacity: 0.7;">移動滑鼠可查看點坐標</span>
+            </div>
+            <canvas id="parabolaCanvas" class="math-canvas"></canvas>
+          </div>
+
+          <!-- Controls & Real-time Metrics -->
+          <div class="controls-panel">
+            <!-- Sliders -->
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>係數 a (開口與曲率)</span>
+                <span class="slider-val" id="valA">-2.0</span>
+              </div>
+              <input type="range" id="sliderA" class="range-slider" min="-5" max="5" step="0.5" value="-2">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>係數 b (左右對稱軸位移)</span>
+                <span class="slider-val" id="valB">4.0</span>
+              </div>
+              <input type="range" id="sliderB" class="range-slider" min="-10" max="10" step="0.5" value="4">
+            </div>
+
+            <div class="control-group">
+              <div class="control-label-row">
+                <span>常數 c (y 軸截距)</span>
+                <span class="slider-val" id="valC">1.0</span>
+              </div>
+              <input type="range" id="sliderC" class="range-slider" min="-10" max="10" step="0.5" value="1">
+            </div>
+
+            <!-- Dynamic Property Metrics -->
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <span class="metric-label">頂點坐標 Vertex</span>
+                <span class="metric-value cyan" id="metricVertex">(1.00, 3.00)</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">對稱軸 Axis</span>
+                <span class="metric-value indigo" id="metricAxis">x = 1.00</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">判別式與交點 Discriminant</span>
+                <span class="metric-value emerald" id="metricDelta">D = 24.0 (兩交點)</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">極值 Extrema</span>
+                <span class="metric-value amber" id="metricExtrema">最大值 3.00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           Module 2: Inequality Number Line Visualizer
+           ==================================================================== -->
+      <section class="glass-card" id="inequality-lab" style="margin-bottom: 3.5rem;">
+        <div class="section-header">
+          <div>
+            <div class="section-tag">⚡ Interactive Module 02</div>
+            <h2 class="section-title">絕對值與一元二次不等式數線儀</h2>
+            <p class="section-desc">直觀呈現不等式解集的數線幾何區間、實心與空心端點特性。</p>
+          </div>
+          <!-- Tabs -->
+          <div class="tabs-nav" id="inequalityTabs">
+            <button class="tab-btn active" data-mode="q3" onclick="setInequalityMode('q3')">計算 3: |x + 3| ≤ 2</button>
+            <button class="tab-btn" data-mode="q4" onclick="setInequalityMode('q4')">計算 4: |2x - 5| > 3</button>
+            <button class="tab-btn" data-mode="q7" onclick="setInequalityMode('q7')">計算 7: 2x² + 5x - 3 &lt; 0</button>
+          </div>
+        </div>
+
+        <div class="canvas-container" style="padding: 1.5rem 1rem;">
+          <div style="margin-bottom: 1rem; padding: 0.5rem 1rem;">
+            <h3 id="inequalityDesc" style="font-size: 1.15rem; color: #fff; margin-bottom: 0.4rem;">試卷第 3 題：求不等式 |x + 3| ≤ 2 的解</h3>
+            <p id="inequalityAnswer" style="color: var(--text-secondary); font-size: 0.95rem;">展開絕對值：-2 ≤ x + 3 ≤ 2 ➔ <strong style="color:#38bdf8">-5 ≤ x ≤ -1</strong>（封閉區間，實心端點）</p>
+          </div>
+          <canvas id="inequalityCanvas" class="math-canvas" style="height: 200px;"></canvas>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           Module 3: Coordinate Geometry Workbench
+           ==================================================================== -->
+      <section class="glass-card" id="geometry-lab" style="margin-bottom: 3.5rem;">
+        <div class="section-header">
+          <div>
+            <div class="section-tag">⚡ Interactive Module 03</div>
+            <h2 class="section-title">平面解析幾何動態畫板</h2>
+            <p class="section-desc">即時視覺化圓的直徑、三角形重心三中線交點、平行四邊形對角線平分與坐標軸距離。</p>
+          </div>
+          <div class="tabs-nav" id="geoTabs">
+            <button class="tab-btn active" data-tab="circle" onclick="setGeometryTab('circle')">計算 6: 圓與直徑長</button>
+            <button class="tab-btn" data-tab="centroid" onclick="setGeometryTab('centroid')">計算 5: 重心 G(3, -1)</button>
+            <button class="tab-btn" data-tab="parallelogram" onclick="setGeometryTab('parallelogram')">計算 8: 平行四邊形第四點</button>
+            <button class="tab-btn" data-tab="distance" onclick="setGeometryTab('distance')">填充 5: 點到軸距離</button>
+          </div>
+        </div>
+
+        <div class="interactive-grid">
+          <div class="canvas-container">
+            <canvas id="geometryCanvas" class="math-canvas" style="height: 420px;"></canvas>
+          </div>
+          <div class="glass-card" id="geoInfoBox" style="padding: 1.5rem; background: var(--bg-glass-input); border-radius: var(--radius-lg); font-size: 0.95rem; line-height: 1.8;">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           Module 4: Exam Solutions Library
+           ==================================================================== -->
+      <section id="exam-cards" style="margin-bottom: 3.5rem;">
+        <div class="section-header">
+          <div>
+            <div class="section-tag">📚 Complete Exam Solutions</div>
+            <h2 class="section-title">試卷全題目逐步互動詳解</h2>
+            <p class="section-desc">完整收錄計算題 1~8 題及填充題 1~5 題的推導過程、滿分答題關鍵與觀念剖析。</p>
+          </div>
+        </div>
+
+        <div class="questions-grid">
+          <!-- 計算 1 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 1</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">二次函數開口方向、頂點坐標、對稱軸及最大(小)值</h3>
+            <div class="q-formula">y = -2x² + 4x + 1</div>
+            <div class="q-steps">
+              <p>• a = -2 &lt; 0 ➔ 開口<strong>向下</strong>，有<strong>最大值</strong></p>
+              <p>• 對稱軸：x = -b/(2a) = -4/(-4) = <strong>1</strong></p>
+              <p>• 頂點 y：-2(1)² + 4(1) + 1 = <strong>3</strong> ➔ 頂點為 <strong>(1, 3)</strong></p>
+              <p>• 當 x = 1 時，有最大值 <strong>3</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#parabola-lab'; loadParabolaPreset('q1')">在畫布中查看 ➔</button>
+          </article>
+
+          <!-- 計算 2 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 2</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">二次函數圖形與 x 軸的相交情形</h3>
+            <div class="q-formula">(1) x² - 3x + 5 &nbsp;|&nbsp; (2) -x² + 6x - 9</div>
+            <div class="q-steps">
+              <p>• (1) 判別式 D = (-3)² - 4(1)(5) = 9 - 20 = -11 &lt; 0 ➔ <strong>沒有交點</strong></p>
+              <p>• (2) 判別式 D = 6² - 4(-1)(-9) = 36 - 36 = 0 ➔ <strong>相交一點 (相切)</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#parabola-lab'; loadParabolaPreset('q2_1')">在畫布中查看 ➔</button>
+          </article>
+
+          <!-- 計算 3 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 3</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">求絕對值不等式 |x + 3| ≤ 2 的解</h3>
+            <div class="q-formula">-2 ≤ x + 3 ≤ 2</div>
+            <div class="q-steps">
+              <p>• 展開絕對值：距離中心 -3 不超過 2 單位</p>
+              <p>• 全式減 3 得：<strong>-5 ≤ x ≤ -1</strong></p>
+              <p>• 幾何意義：在數線上介於 -5 與 -1 之間的閉區間</p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#inequality-lab'; setInequalityMode('q3')">在數線中查看 ➔</button>
+          </article>
+
+          <!-- 計算 4 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 4</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">求不等式 |2x - 5| > 3 的解</h3>
+            <div class="q-formula">2x - 5 > 3 或 2x - 5 &lt; -3</div>
+            <div class="q-steps">
+              <p>• (1) 2x - 5 > 3 ➔ 2x > 8 ➔ <strong>x > 4</strong></p>
+              <p>• (2) 2x - 5 &lt; -3 ➔ 2x &lt; 2 ➔ <strong>x &lt; 1</strong></p>
+              <p>• 解為：<strong>x &lt; 1 或 x > 4</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#inequality-lab'; setInequalityMode('q4')">在數線中查看 ➔</button>
+          </article>
+
+          <!-- 計算 5 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 5</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">已知三頂點與重心 G(3, -1)，求 a, b</h3>
+            <div class="q-formula">A(a, -5), B(3, b), C(4, -3)</div>
+            <div class="q-steps">
+              <p>• 重心 x 坐標：(a + 3 + 4)/3 = 3 ➔ 7 + a = 9 ➔ <strong>a = 2</strong></p>
+              <p>• 重心 y 坐標：(-5 + b - 3)/3 = -1 ➔ -8 + b = -3 ➔ <strong>b = 5</strong></p>
+              <p>• 答：<strong>a = 2, b = 5</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#geometry-lab'; setGeometryTab('centroid')">在幾何中查看 ➔</button>
+          </article>
+
+          <!-- 計算 6 (重點扣分題剖析) -->
+          <article class="q-card" style="border-color: rgba(245, 158, 11, 0.4);">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 6</span>
+              <span class="q-score-tag deducted">實得 7 / 10 (扣 3 分)</span>
+            </div>
+            <h3 class="q-title">直徑兩端點 A(-3, 2), B(0, 6)，求圓心與直徑長</h3>
+            <div class="q-formula">圓心 (-3/2, 4) &nbsp;|&nbsp; 直徑長 d = 5</div>
+            <div class="q-steps">
+              <p>• (1) 圓心坐標 (中點)：((-3+0)/2, (2+6)/2) = <strong>(-3/2, 4)</strong> (正確)</p>
+              <p>• (2) 直徑長：√[(0 - (-3))² + (6 - 2)²] = √(9 + 16) = <strong>5</strong></p>
+              <p style="color:#f59e0b;">⚠ 叮嚀：試卷中漏寫了小題 (2) 直徑長，因此被扣 3 分！</p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#geometry-lab'; setGeometryTab('circle')">在幾何中查看 ➔</button>
+          </article>
+
+          <!-- 計算 7 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 7</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">解一元二次不等式：2x² + 5x - 3 &lt; 0</h3>
+            <div class="q-formula">(2x - 1)(x + 3) &lt; 0</div>
+            <div class="q-steps">
+              <p>• 十字交乘因式分解：(2x - 1)(x + 3) &lt; 0</p>
+              <p>• 方程式之兩根為 x = 1/2 與 x = -3</p>
+              <p>• 開口向上且小於 0 ➔ 取兩根之間：<strong>-3 &lt; x &lt; 1/2</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#inequality-lab'; setInequalityMode('q7')">在數線中查看 ➔</button>
+          </article>
+
+          <!-- 計算 8 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge calc">計算題 8</span>
+              <span class="q-score-tag">得分 10 / 10</span>
+            </div>
+            <h3 class="q-title">平行四邊形 ABCD，求頂點 B 坐標</h3>
+            <div class="q-formula">A(3, 4), C(-1, -2), D(2, 5)</div>
+            <div class="q-steps">
+              <p>• 對角線 AC 中點等於 BD 中點 ➔ A + C = B + D</p>
+              <p>• B = A + C - D</p>
+              <p>• B_x = 3 + (-1) - 2 = 0；B_y = 4 + (-2) - 5 = -3</p>
+              <p>• 答：<strong>B(0, -3)</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#geometry-lab'; setGeometryTab('parallelogram')">在幾何中查看 ➔</button>
+          </article>
+
+          <!-- 填充 1~5 題綜合卡片 -->
+          <article class="q-card">
+            <div class="q-card-header">
+              <span class="q-badge fill">填充題 1~5 全覽</span>
+              <span class="q-score-tag">得分 20 / 20</span>
+            </div>
+            <h3 class="q-title">五道填充題精確計算總覽</h3>
+            <div class="q-formula">填充題全數答對滿分</div>
+            <div class="q-steps">
+              <p>1. 因式分解 x² - 10x + 24 = <strong>(x - 6)(x - 4)</strong></p>
+              <p>2. f(2) + f(-1) = 11 + 5 = <strong>16</strong></p>
+              <p>3. P(b - a, a³b) 坐標正負為 (+, -) ➔ <strong>第四象限</strong></p>
+              <p>4. 拋物線平移後為 <strong>f(x) = (x - 5)² - 4</strong></p>
+              <p>5. A(-2, 5) 距離 a = |5| = <strong>5</strong>, b = |-2| = <strong>2</strong></p>
+            </div>
+            <button class="q-action-btn" onclick="location.href='#quiz-challenge'">挑戰隨堂測驗 ➔</button>
+          </article>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           Module 5: Quiz Challenge
+           ==================================================================== -->
+      <section class="glass-card" id="quiz-challenge" style="margin-bottom: 4rem;">
+        <div class="section-header" style="text-align: center; justify-content: center;">
+          <div>
+            <div class="section-tag" style="justify-content: center;">🎯 Knowledge Check</div>
+            <h2 class="section-title">高一數學實力隨堂檢測</h2>
+            <p class="section-desc" style="margin: 0.5rem auto 0;">精選試卷觀念題目，立即自我測驗並獲得即時解析！</p>
+          </div>
+        </div>
+
+        <div class="quiz-container">
+          <div class="quiz-progress-bar">
+            <div class="quiz-progress-fill" id="quizProgressFill"></div>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">單選測驗題</span>
+            <span id="quizScoreDisplay" style="font-weight: 700; color: var(--accent-emerald);">得分: 0</span>
+          </div>
+
+          <h3 id="quizQuestionText" style="font-size: 1.2rem; font-weight: 700; line-height: 1.5; color: #fff;">載入中...</h3>
+          
+          <div class="quiz-options-list" id="quizOptionsList"></div>
+
+          <div class="quiz-explanation" id="quizExplanation" style="display: none;"></div>
+
+          <div style="text-align: right; margin-top: 1.5rem;">
+            <button class="btn btn-primary" id="quizNextBtn" style="display: none;">下一題 ➔</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>MathVerse © 2026 高中數學互動探索平台</p>
+      <p style="margin-top: 0.4rem; font-size: 0.85rem;">Designed with <span class="footer-heart">♥</span> for High School Mathematics Excellence</p>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
